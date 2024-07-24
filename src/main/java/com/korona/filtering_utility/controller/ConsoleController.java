@@ -1,2 +1,4 @@
-package com.korona.filtering_utility.controller;public class ConsoleController {
+package com.korona.filtering_utility.controller;
+
+public class ConsoleController {
 }
