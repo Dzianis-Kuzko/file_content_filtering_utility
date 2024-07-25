@@ -6,46 +6,65 @@ import com.korona.filtering_utility.servise.util.DataClassifier;
 import java.util.List;
 
 public class FileService {
+    private final static String DEFAULT_FILE_PATH_FOR_INTEGERS = "integer.txt";
+    private final static String DEFAULT_FILE_PATH_FOR_FLOATS = "floats.txt";
+    private final static String DEFAULT_FILE_PATH_FOR_STRINGS = "strings.txt";
     private List<String> inputFiles;
+    private String filePathForIntegers;
+    private String filePathForFloats;
+    private String filePathForStrings;
 
-    public FileService(List<String> inputFiles) {
-        this.inputFiles = inputFiles;
-    }
 
-    public void filterData(){
+    public void filterData(List<String> inputFiles, String outputDir, String prefix, boolean append) {
+        setFilePaths(outputDir, prefix);
+
 
         FileDao fileDaoForWriteInteger = new FileDao();
-        fileDaoForWriteInteger.initializeWriter("./integer.txt");
+        fileDaoForWriteInteger.initializeWriter(filePathForIntegers);
         FileDao fileDaoForWriterFloat = new FileDao();
-        fileDaoForWriterFloat.initializeWriter("./float.txt");
+        fileDaoForWriterFloat.initializeWriter(filePathForFloats);
         FileDao fileDaoForWriterString = new FileDao();
-        fileDaoForWriterString.initializeWriter("./string.txt");
+        fileDaoForWriterString.initializeWriter(filePathForStrings);
 
-       for (String inputFile: inputFiles){
-           FileDao fileDaoForRead = new FileDao();
-           fileDaoForRead.initializeReader(inputFile);
+        for (String inputFile : inputFiles) {
+            FileDao fileDaoForRead = new FileDao();
+            fileDaoForRead.initializeReader(inputFile);
 
-           String line;
+            String line;
 
-           while ((line=fileDaoForRead.readNextLine()) !=null){
-               if(DataClassifier.isInteger(line)== true){
-                   fileDaoForWriteInteger.writeLine(line);
+            while ((line = fileDaoForRead.readNextLine()) != null) {
+                if (DataClassifier.isInteger(line) == true) {
+                    fileDaoForWriteInteger.writeLine(line);
 
-               } else if (DataClassifier.isFloat(line) == true) {
-                   fileDaoForWriterFloat.writeLine(line);
+                } else if (DataClassifier.isFloat(line) == true) {
+                    fileDaoForWriterFloat.writeLine(line);
 
-               }else {
-                   fileDaoForWriterString.writeLine(line);
-               }
-           }
+                } else {
+                    fileDaoForWriterString.writeLine(line);
+                }
+            }
 
-           fileDaoForRead.closeWriter();
+            fileDaoForRead.closeWriter();
 
-       }
+        }
 
-       fileDaoForWriteInteger.closeWriter();
-       fileDaoForWriterString.closeWriter();
-       fileDaoForWriterFloat.closeWriter();
+        fileDaoForWriteInteger.closeWriter();
+        fileDaoForWriterString.closeWriter();
+        fileDaoForWriterFloat.closeWriter();
+
+    }
+
+    private void setFilePaths(String outputDir, String prefix) {
+        if (outputDir == null) {
+            outputDir = "";
+        }
+        if (prefix == null) {
+            prefix = "";
+        }
+
+        filePathForIntegers = outputDir + "/" + prefix + DEFAULT_FILE_PATH_FOR_INTEGERS;
+        filePathForFloats = outputDir + "/" + prefix + DEFAULT_FILE_PATH_FOR_FLOATS;
+        filePathForStrings = outputDir + "/" + prefix + DEFAULT_FILE_PATH_FOR_STRINGS;
 
     }
 }
