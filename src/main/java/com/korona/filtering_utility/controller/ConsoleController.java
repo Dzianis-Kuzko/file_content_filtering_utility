@@ -1,12 +1,13 @@
 package com.korona.filtering_utility.controller;
 
 import com.korona.filtering_utility.servise.FileService;
+import com.korona.filtering_utility.servise.api.IFileService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
-    private final FileService fileService;
+    private final IFileService fileService;
     private String outputDir;
     private String prefix;
     private boolean append;
@@ -18,7 +19,10 @@ public class ConsoleController {
 
     public void execute(String[] args) {
         processArguments(args);
-        fileService.filterData(inputFiles, outputDir, prefix, append);
+
+        fileService.setFilePaths(outputDir, prefix);
+
+        fileService.filterData(inputFiles,  append);
 
     }
 
@@ -42,6 +46,4 @@ public class ConsoleController {
             }
         }
     }
-
-
 }

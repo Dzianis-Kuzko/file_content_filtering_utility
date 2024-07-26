@@ -1,5 +1,8 @@
 package com.korona.filtering_utility.dao;
 
+import com.korona.filtering_utility.dao.api.IFileReaderDao;
+import com.korona.filtering_utility.dao.api.IFileWriterDao;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -7,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class FileDao {
+public class FileDao implements IFileReaderDao, IFileWriterDao {
     private BufferedWriter writer;
     private BufferedReader reader;
     private Iterator<String> lineIterator;
@@ -15,6 +18,7 @@ public class FileDao {
     public FileDao() {
     }
 
+    @Override
     public void initializeReader(String filePath) {
         try {
             reader = new BufferedReader(new FileReader(filePath));
@@ -24,21 +28,24 @@ public class FileDao {
         }
     }
 
-    public void initializeWriter(String filePath) {
+    @Override
+    public void initializeWriter(String filePath, boolean append) {
         try {
-            writer = new BufferedWriter(new FileWriter(filePath));
+            writer = new BufferedWriter(new FileWriter(filePath, append));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String readNextLine() {
+    @Override
+    public String readLine() {
         if (lineIterator != null && lineIterator.hasNext()) {
             return lineIterator.next();
         }
-        return null; // Возвращаем null, если больше нет строк для чтения
+        return null;
     }
 
+    @Override
     public void writeLine(String line) {
         if (writer != null) {
             try {
@@ -50,6 +57,7 @@ public class FileDao {
         }
     }
 
+    @Override
     public void closeReader() {
         if (reader != null) {
             try {
@@ -60,6 +68,7 @@ public class FileDao {
         }
     }
 
+    @Override
     public void closeWriter() {
         if (writer != null) {
             try {
