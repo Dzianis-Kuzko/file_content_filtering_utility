@@ -22,7 +22,7 @@ public class ConsoleController {
 
         fileService.setFilePaths(outputDir, prefix);
 
-        fileService.filterData(inputFiles,  append);
+        fileService.filterData(inputFiles, append);
 
     }
 
@@ -31,7 +31,7 @@ public class ConsoleController {
             switch (args[i]) {
                 case "-o":
                     i++;
-                    outputDir = args[i];
+                    outputDir = args[i] + "/";
                     break;
                 case "-p":
                     i++;
