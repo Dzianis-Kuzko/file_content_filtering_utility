@@ -2,6 +2,7 @@ package com.korona.filtering_utility.dao;
 
 import com.korona.filtering_utility.dao.api.IFileReaderDao;
 import com.korona.filtering_utility.dao.api.IFileWriterDao;
+import com.korona.filtering_utility.exeption.FileDaoException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,7 +25,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
             reader = new BufferedReader(new FileReader(filePath));
             lineIterator = reader.lines().iterator();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FileDaoException("Failed to initialize reader for file: " + filePath, e);
         }
     }
 
@@ -33,7 +34,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
         try {
             writer = new BufferedWriter(new FileWriter(filePath, append));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw  new FileDaoException("Failed to initialize writer for file: " + filePath, e);
         }
     }
 
@@ -52,7 +53,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
                 writer.write(line);
                 writer.newLine();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new FileDaoException("Failed to write line to file.", e);
             }
         }
     }
@@ -63,7 +64,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
             try {
                 reader.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new FileDaoException("Failed to close reader.", e);
             }
         }
     }
@@ -74,9 +75,13 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
             try {
                 writer.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new FileDaoException("Failed to close writer." , e);
             }
         }
+    }
+
+    public boolean isWriterInitialized() {
+        return writer != null;
     }
 
 }

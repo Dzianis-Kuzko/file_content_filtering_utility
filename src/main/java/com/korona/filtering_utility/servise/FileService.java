@@ -13,34 +13,40 @@ public class FileService implements IFileService {
     private static final String DEFAULT_FILE_PATH_FOR_FLOATS = "floats.txt";
     private static final String DEFAULT_FILE_PATH_FOR_STRINGS = "strings.txt";
 
-    private IFileWriterDao integerFileDao;
-    private IFileWriterDao floatFileDao;
-    private IFileWriterDao stringFileDao;
-    private IFileReaderDao readFileDao;
+    private final IFileWriterDao integerFileDao;
+    private final IFileWriterDao floatFileDao;
+    private final IFileWriterDao stringFileDao;
+    private final IFileReaderDao readFileDao;
 
     private String filePathForIntegers;
     private String filePathForFloats;
     private String filePathForStrings;
 
     public FileService() {
+        this.integerFileDao = new FileDao();
+        this.floatFileDao = new FileDao();
+        this.stringFileDao = new FileDao();
         this.readFileDao = new FileDao();
     }
 
     @Override
     public void filterData(List<String> inputFiles, boolean append) {
+        try {
+            for (String inputFile : inputFiles) {
+                try {
+                    readFileDao.initializeReader(inputFile);
+                    String line;
 
-        for (String inputFile : inputFiles) {
-            readFileDao.initializeReader(inputFile);
-            String line;
-
-            while ((line = readFileDao.readLine()) != null) {
-                classifyAndWriteLine(line, append);
+                    while ((line = readFileDao.readLine()) != null) {
+                        classifyAndWriteLine(line, append);
+                    }
+                } finally {
+                    readFileDao.closeReader();
+                }
             }
-
-            readFileDao.closeReader();
+        } finally {
+            closeWriters();
         }
-
-        closeWriters();
     }
 
     @Override
@@ -61,22 +67,21 @@ public class FileService implements IFileService {
 
     private void classifyAndWriteLine(String line, boolean append) {
         if (DataClassifier.isInteger(line)) {
-            if (integerFileDao == null) {
-                integerFileDao = new FileDao();
+            if (!integerFileDao.isWriterInitialized()) {
                 integerFileDao.initializeWriter(filePathForIntegers, append);
             }
+
             integerFileDao.writeLine(line);
 
         } else if (DataClassifier.isFloat(line)) {
-            if (floatFileDao == null) {
-                floatFileDao = new FileDao();
+            if (!floatFileDao.isWriterInitialized()) {
                 floatFileDao.initializeWriter(filePathForFloats, append);
             }
 
             floatFileDao.writeLine(line);
+
         } else {
-            if (stringFileDao == null) {
-                stringFileDao = new FileDao();
+            if (!stringFileDao.isWriterInitialized()) {
                 stringFileDao.initializeWriter(filePathForStrings, append);
             }
 
@@ -85,15 +90,15 @@ public class FileService implements IFileService {
     }
 
     private void closeWriters() {
-        if (integerFileDao != null) {
+        if (integerFileDao.isWriterInitialized()) {
             integerFileDao.closeWriter();
         }
 
-        if (floatFileDao != null) {
+        if (floatFileDao.isWriterInitialized()) {
             floatFileDao.closeWriter();
         }
 
-        if (stringFileDao != null) {
+        if (stringFileDao.isWriterInitialized()) {
             stringFileDao.closeWriter();
         }
     }

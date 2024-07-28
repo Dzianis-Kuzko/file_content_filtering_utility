@@ -1,28 +1,37 @@
 package com.korona.filtering_utility.controller;
 
-import com.korona.filtering_utility.servise.FileService;
+import com.korona.filtering_utility.exeption.FileDaoException;
 import com.korona.filtering_utility.servise.api.IFileService;
+import com.korona.filtering_utility.view.api.IView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
     private final IFileService fileService;
+    private final IView consoleView;
     private String outputDir;
     private String prefix;
     private boolean append;
     private List<String> inputFiles = new ArrayList<>();
 
-    public ConsoleController() {
-        fileService = new FileService();
+    public ConsoleController(IFileService fileService, IView consoleView) {
+        this.fileService = fileService;
+        this.consoleView = consoleView;
     }
 
     public void execute(String[] args) {
-        processArguments(args);
+       try {
 
-        fileService.setFilePaths(outputDir, prefix);
+           processArguments(args);
 
-        fileService.filterData(inputFiles, append);
+           fileService.setFilePaths(outputDir, prefix);
+
+           fileService.filterData(inputFiles, append);
+
+       }catch (FileDaoException e){
+           handleException(e);
+       }
 
     }
 
@@ -45,5 +54,8 @@ public class ConsoleController {
                     break;
             }
         }
+    }
+    private void handleException(Exception e) {
+        consoleView.displayError(e.getMessage(), e);
     }
 }
