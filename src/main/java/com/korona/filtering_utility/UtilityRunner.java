@@ -6,7 +6,7 @@ import com.korona.filtering_utility.view.ConsoleView;
 
 public class UtilityRunner {
     public static void main(String[] args) {
-        ConsoleController consoleController = new ConsoleController(new FileService(), new ConsoleView());
+        ConsoleController consoleController = new ConsoleController();
         consoleController.execute(args);
     }
 }

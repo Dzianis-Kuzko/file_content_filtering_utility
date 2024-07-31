@@ -11,8 +11,7 @@ public class ConsoleView implements IView {
     @Override
 
     public void displayError(String errorMessage, Exception e) {
-        System.out.println("ConsoleView");
-        System.err.println("Error: " + errorMessage);
+         System.err.println("Error: " + errorMessage);
         e.printStackTrace();
     }
 }

@@ -1,37 +1,54 @@
 package com.korona.filtering_utility.controller;
 
+import com.korona.filtering_utility.dto.FullStatisticsDTO;
+import com.korona.filtering_utility.dto.ShortStatisticsDTO;
 import com.korona.filtering_utility.exeption.FileDaoException;
+import com.korona.filtering_utility.formatter.StatisticsDTOFormatter;
+import com.korona.filtering_utility.servise.FileService;
+import com.korona.filtering_utility.servise.FullStatisticsService;
+import com.korona.filtering_utility.servise.ShortStatisticsService;
 import com.korona.filtering_utility.servise.api.IFileService;
+import com.korona.filtering_utility.servise.api.IStatisticsService;
+import com.korona.filtering_utility.view.ConsoleView;
 import com.korona.filtering_utility.view.api.IView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
-    private final IFileService fileService;
-    private final IView consoleView;
+    private IFileService fileService;
+    private IView consoleView;
+    private IStatisticsService statisticsService;
+
     private String outputDir;
     private String prefix;
     private boolean append;
+    private TypeOfStatistics typeOfStatistics;
     private List<String> inputFiles = new ArrayList<>();
 
-    public ConsoleController(IFileService fileService, IView consoleView) {
-        this.fileService = fileService;
-        this.consoleView = consoleView;
+    public ConsoleController() {
+        this.consoleView = new ConsoleView();
+
     }
 
     public void execute(String[] args) {
-       try {
+        try {
 
-           processArguments(args);
+            processArguments(args);
+            initializeStatisticsService();
+            fileService = new FileService(statisticsService);
 
-           fileService.setFilePaths(outputDir, prefix);
+            fileService.setFilePaths(outputDir, prefix);
 
-           fileService.filterData(inputFiles, append);
+            fileService.filterData(inputFiles, append);
 
-       }catch (FileDaoException e){
-           handleException(e);
-       }
+            displayStatistics();
+
+        } catch (FileDaoException e) {
+            handleException(e);
+        } catch (Exception e){
+            handleException(e);
+        }
 
     }
 
@@ -49,13 +66,43 @@ public class ConsoleController {
                 case "-a":
                     append = true;
                     break;
+                case "-s":
+                    typeOfStatistics = TypeOfStatistics.SHORT;
+                    break;
+                case "-f":
+                    typeOfStatistics = TypeOfStatistics.FULL;
+                    break;
+
                 default:
                     inputFiles.add(args[i]);
                     break;
             }
         }
     }
+
     private void handleException(Exception e) {
         consoleView.displayError(e.getMessage(), e);
+    }
+
+    private void initializeStatisticsService() {
+        if (typeOfStatistics == TypeOfStatistics.SHORT) {
+            statisticsService = new ShortStatisticsService();
+
+        } else if (typeOfStatistics == TypeOfStatistics.FULL) {
+            statisticsService = new FullStatisticsService();
+        }
+    }
+
+    private void displayStatistics() {
+        if (typeOfStatistics == TypeOfStatistics.SHORT) {
+            ShortStatisticsDTO shortStatisticsDTO = (ShortStatisticsDTO) statisticsService.getStatistics();
+            String formattedStatistics = StatisticsDTOFormatter.statisticsDTOtoString(shortStatisticsDTO);
+            consoleView.displayMessage(formattedStatistics);
+
+        } else if (typeOfStatistics == TypeOfStatistics.FULL) {
+            FullStatisticsDTO fullStatisticsDTO = (FullStatisticsDTO) statisticsService.getStatistics();
+            String formattedStatistics = StatisticsDTOFormatter.statisticsDTOtoString(fullStatisticsDTO);
+            consoleView.displayMessage(formattedStatistics);
+        }
     }
 }

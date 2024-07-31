@@ -4,6 +4,7 @@ import com.korona.filtering_utility.dao.FileDao;
 import com.korona.filtering_utility.dao.api.IFileReaderDao;
 import com.korona.filtering_utility.dao.api.IFileWriterDao;
 import com.korona.filtering_utility.servise.api.IFileService;
+import com.korona.filtering_utility.servise.api.IStatisticsService;
 import com.korona.filtering_utility.servise.util.DataClassifier;
 
 import java.util.List;
@@ -18,19 +19,23 @@ public class FileService implements IFileService {
     private final IFileWriterDao stringFileDao;
     private final IFileReaderDao readFileDao;
 
+    private final IStatisticsService statisticsService;
+
     private String filePathForIntegers;
     private String filePathForFloats;
     private String filePathForStrings;
 
-    public FileService() {
+    public FileService(IStatisticsService statisticsService) {
         this.integerFileDao = new FileDao();
         this.floatFileDao = new FileDao();
         this.stringFileDao = new FileDao();
         this.readFileDao = new FileDao();
+        this.statisticsService = statisticsService;
     }
 
     @Override
     public void filterData(List<String> inputFiles, boolean append) {
+
         try {
             for (String inputFile : inputFiles) {
                 try {
@@ -51,6 +56,15 @@ public class FileService implements IFileService {
 
     @Override
     public void setFilePaths(String outputDir, String prefix) {
+        if (statisticsService != null) {
+            statisticsService.setFileNames(
+                    new String[]{
+                            prefix + DEFAULT_FILE_PATH_FOR_STRINGS,
+                            prefix + DEFAULT_FILE_PATH_FOR_FLOATS,
+                            prefix + DEFAULT_FILE_PATH_FOR_STRINGS}
+            );
+        }
+
         if (outputDir == null) {
             outputDir = "";
         }
@@ -73,6 +87,10 @@ public class FileService implements IFileService {
 
             integerFileDao.writeLine(line);
 
+            if (statisticsService != null) {
+                statisticsService.addIntegerData(line);
+            }
+
         } else if (DataClassifier.isFloat(line)) {
             if (!floatFileDao.isWriterInitialized()) {
                 floatFileDao.initializeWriter(filePathForFloats, append);
@@ -80,12 +98,21 @@ public class FileService implements IFileService {
 
             floatFileDao.writeLine(line);
 
+            if (statisticsService != null) {
+                statisticsService.addFloatData(line);
+            }
+
         } else {
             if (!stringFileDao.isWriterInitialized()) {
                 stringFileDao.initializeWriter(filePathForStrings, append);
             }
 
             stringFileDao.writeLine(line);
+
+            if (statisticsService != null) {
+                statisticsService.addStringData(line);
+            }
+
         }
     }
 
