@@ -25,9 +25,25 @@ public class FullStatisticsService extends ShortStatisticsService {
         fullStatisticsDTO.setCountInteger(shortStatsDTO.getCountInteger());
         fullStatisticsDTO.setCountFloat(shortStatsDTO.getCountFloat());
         fullStatisticsDTO.setCountString(shortStatsDTO.getCountString());
+
         fullStatisticsDTO.setFileNameForInteger(shortStatsDTO.getFileNameForInteger());
         fullStatisticsDTO.setFileNameForFloat(shortStatsDTO.getFileNameForFloat());
         fullStatisticsDTO.setFileNameForString(shortStatsDTO.getFileNameForString());
+
+        if (shortStatsDTO.getCountInteger() == 0) {
+            fullStatisticsDTO.setMinInteger(0);
+            fullStatisticsDTO.setMaxInteger(0);
+        }
+
+        if (shortStatsDTO.getCountFloat() == 0) {
+            fullStatisticsDTO.setMinFloat(0);
+            fullStatisticsDTO.setMaxFloat(0);
+        }
+
+        if(shortStatsDTO.getCountString()==0){
+            fullStatisticsDTO.setMinLengthString(0);
+            fullStatisticsDTO.setMaxLengthString(0);
+        }
 
         fullStatisticsDTO.setAvgInteger(calculateAvgInteger());
         fullStatisticsDTO.setAvgFloat(calculateAvgFloat());
