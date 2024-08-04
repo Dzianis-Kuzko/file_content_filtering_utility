@@ -14,7 +14,6 @@
 
 ### - Task 1 -
 * Clone the branch
-
 ```console
 git clone https://github.com/Dzianis-Kuzko/file_content_filtering_utility.git
 ```
@@ -26,4 +25,3 @@ javac -cp src\main\java -d .\out\src .\src\main\java\com\korona\filtering_utilit
 * Run the application
 ```console
  java -cp out\src com.korona.filtering_utility.UtilityRunner -f -a -p result_ -o D:\ in1.txt in2.txt
-```
