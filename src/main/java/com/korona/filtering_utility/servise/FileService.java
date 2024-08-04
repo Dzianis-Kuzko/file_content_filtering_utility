@@ -59,7 +59,7 @@ public class FileService implements IFileService {
         if (statisticsService != null) {
             statisticsService.setFileNames(
                     new String[]{
-                            prefix + DEFAULT_FILE_PATH_FOR_STRINGS,
+                            prefix + DEFAULT_FILE_PATH_FOR_INTEGERS,
                             prefix + DEFAULT_FILE_PATH_FOR_FLOATS,
                             prefix + DEFAULT_FILE_PATH_FOR_STRINGS}
             );

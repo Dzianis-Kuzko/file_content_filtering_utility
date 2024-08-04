@@ -3,6 +3,7 @@ package com.korona.filtering_utility.controller;
 import com.korona.filtering_utility.dto.FullStatisticsDTO;
 import com.korona.filtering_utility.dto.ShortStatisticsDTO;
 import com.korona.filtering_utility.exeption.FileDaoException;
+import com.korona.filtering_utility.exeption.InvalidCommandLineArgException;
 import com.korona.filtering_utility.formatter.StatisticsDTOFormatter;
 import com.korona.filtering_utility.servise.FileService;
 import com.korona.filtering_utility.servise.FullStatisticsService;
@@ -24,11 +25,12 @@ public class ConsoleController {
     private String prefix;
     private boolean append;
     private TypeOfStatistics typeOfStatistics;
-    private List<String> inputFiles = new ArrayList<>();
+    private List<String> inputFiles;
 
     public ConsoleController() {
         this.consoleView = new ConsoleView();
-
+        this.inputFiles = new ArrayList<>();
+        prefix="";
     }
 
     public void execute(String[] args) {
@@ -36,20 +38,18 @@ public class ConsoleController {
 
             processArguments(args);
             initializeStatisticsService();
+
             fileService = new FileService(statisticsService);
-
             fileService.setFilePaths(outputDir, prefix);
-
             fileService.filterData(inputFiles, append);
 
             displayStatistics();
 
         } catch (FileDaoException e) {
             handleException(e);
-        } catch (Exception e){
+        } catch (Exception e) {
             handleException(e);
         }
-
     }
 
     private void processArguments(String[] args) {
@@ -72,9 +72,16 @@ public class ConsoleController {
                 case "-f":
                     typeOfStatistics = TypeOfStatistics.FULL;
                     break;
-
                 default:
-                    inputFiles.add(args[i]);
+                    if (args[i].startsWith("-")) {
+                        try {
+                            throw new InvalidCommandLineArgException("Unknown option: " + args[i] + ". Processing will continue");
+                        } catch (InvalidCommandLineArgException e) {
+                            handleException(e);
+                        }
+                    } else {
+                        inputFiles.add(args[i]);
+                    }
                     break;
             }
         }

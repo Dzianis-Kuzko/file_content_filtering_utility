@@ -26,7 +26,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
             reader = new BufferedReader(new FileReader(filePath));
             lineIterator = reader.lines().iterator();
         } catch (IOException e) {
-            throw new FileDaoException("Failed to initialize reader for file: " + filePath, e);
+            throw new FileDaoException("Failed to initialize reader for file: " + filePath + ". Processing has been interrupted", e);
         }
     }
 
@@ -35,7 +35,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
         try {
             writer = new BufferedWriter(new FileWriter(filePath, append));
         } catch (IOException e) {
-            throw  new FileDaoException("Failed to initialize writer for file: " + filePath, e);
+            throw  new FileDaoException("Failed to initialize writer for file: " + filePath + ". Processing has been interrupted", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
                 writer.write(line);
                 writer.newLine();
             } catch (IOException e) {
-                throw new FileDaoException("Failed to write line to file.", e);
+                throw new FileDaoException("Failed to write line to file. Processing has been interrupted", e);
             }
         }
     }
@@ -65,7 +65,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
             try {
                 reader.close();
             } catch (IOException e) {
-                throw new FileDaoException("Failed to close reader.", e);
+                throw new FileDaoException("Failed to close reader. Processing has been interrupted", e);
             }
         }
     }
@@ -76,7 +76,7 @@ public class FileDao implements IFileReaderDao, IFileWriterDao {
             try {
                 writer.close();
             } catch (IOException e) {
-                throw new FileDaoException("Failed to close writer." , e);
+                throw new FileDaoException("Failed to close writer. Processing has been interrupted" , e);
             }
         }
     }
